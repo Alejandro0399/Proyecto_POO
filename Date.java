@@ -126,7 +126,10 @@ public class Date implements Comparable<Date> {
 	
 	
 	public String toString() {
-		return "" + this.day + '/' + this.month + "/" + this.year;
+		if(this.month >= 10) {
+			return "" + this.day + '/' + this.month + "/" + this.year;
+		}
+		return "" + this.day + "/0" + this.month + "/" + this.year;
 	}
 	
 	public int compareTo(Date d) {

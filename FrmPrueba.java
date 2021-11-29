@@ -24,16 +24,14 @@ public class FrmPrueba{
 	private DefaultTableModel dtmPaciente, dtmDoctor;
 	private String titulos_doctor [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
 	private String titulos [] = {"Nombre", "Apellidos", "Telefono", "Fecha", "Edad", "Tipo de Sangre", "Alergias", "Sintomas", };
-	private String nombre_tabla = "Pacientes";
 	
-	private JTextField txtNombre, txtApellidos, txtTelefono, txtFecha, txtId, txtEdad, txtSangre, txtAlergias, txtSintomas;
+	private JTextField txtNombre, txtApellidos, txtTelefono, txtFecha, txtEdad, txtSangre, txtAlergias, txtSintomas;
 	private static JLabel lblNombre;
 	private static JLabel lblApellidos;
 	private static JLabel lblDoctores;
 	private static JLabel lblPacientes;
 	private JLabel lblTelefono;
 	private JLabel lblFecha;
-	private JLabel lblId;
 	private JLabel lblSangre;
 	private JLabel lblAlergias;
 	private JLabel lblSintomas;
@@ -69,7 +67,6 @@ public class FrmPrueba{
 		txtApellidos = new JTextField();
 		txtTelefono = new JTextField();
 		txtFecha = new JTextField();
-		txtId = new JTextField();
 		txtSangre = new JTextField();
 		txtAlergias = new JTextField();
 		txtSintomas = new JTextField();
@@ -92,7 +89,6 @@ public class FrmPrueba{
 		lblEdad = new JLabel("Edad:");
 		lblEspecialidad = new JLabel("Especialidad:");
 		lblTelefono = new JLabel("Telefono:");
-		lblId = new JLabel("ID:");
 		lblSangre = new JLabel("Tipo de Sangre:");
 		lblAlergias = new JLabel("Alergias:");
 		lblSintomas = new JLabel("Sintomas:");
@@ -127,6 +123,12 @@ public class FrmPrueba{
 			public void actionPerformed(ActionEvent evt) {
 				crear_doctor(frame2);
 				frame2.setVisible(false);
+			}
+		});
+		
+		btnGuardar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				crear_paciente(frame3);
 			}
 		});
 		
@@ -204,6 +206,7 @@ public class FrmPrueba{
 		frame2.add(lblEspecialidad);
 		
 		frame2.add(btnGuardarDr);
+		frame2.add(btnRegresar);
 		
 		lblNombre.setBounds(20,50,100,20);
 		drNombre.setBounds(120,50,200,20);
@@ -218,6 +221,7 @@ public class FrmPrueba{
 		drEspecialidad.setBounds(120,140,200,20);
 		
 		btnGuardarDr.setBounds(150, 170, 100, 25);
+		btnRegresar.setBounds(150, 210, 100, 25);
 	}
 	
 	
@@ -230,7 +234,6 @@ public class FrmPrueba{
 		
 		frame4.add(jspDoctor);
 		frame4.add(btnRegresar);
-		
 		
 		jspDoctor.setBounds(20, 20, 550, 400);
 		btnRegresar.setBounds(250, 450, 100, 25);
@@ -251,6 +254,35 @@ public class FrmPrueba{
 		bienvenida_layout();
 	}
 		
+	public void crear_paciente(JFrame frame) {
+		String array [] = txtFecha.getText().split("/");
+		if(array.length != 3) {
+			return;
+		}
+		Date fecha = new Date(Integer.parseInt(array[0]), Integer.parseInt(array[1]), Integer.parseInt(array[2]));
+		Paciente p1 = new Paciente(txtNombre.getText(),
+								   txtApellidos.getText(),
+								   Integer.parseInt(txtEdad.getText()),
+								   txtSangre.getText(),
+								   txtAlergias.getText(),
+								   txtSintomas.getText(),
+								   txtTelefono.getText(),
+								   fecha);
+		int status = ConexionAccess.guardar_datos(p1);
+		if(status > 0) {
+			JOptionPane.showMessageDialog(frame.getRootPane(), "Datos del paciente guardados");
+		}
+		mostrar_tablaPacientes();
+		txtNombre.setText("");
+		txtApellidos.setText("");
+		txtEdad.setText("");
+		txtSangre.setText("");
+		txtAlergias.setText("");
+		txtSintomas.setText("");
+		txtTelefono.setText("");
+		txtFecha.setText("");
+	}
+	
 	public void guardar_paciente() {
 		frame3.setLayout(null);
 		frame3.setTitle("Registrar Paciente");
@@ -258,8 +290,6 @@ public class FrmPrueba{
 		frame3.setVisible(true);
 		frame3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				
-		frame3.add(lblId);
-		frame3.add(txtId);
 		
 		frame3.add(lblNombre);
 		frame3.add(txtNombre);
@@ -288,11 +318,10 @@ public class FrmPrueba{
 		frame3.add(btnGuardar);
 		frame3.add(btnNuevo);
 		frame3.add(btnDelete);
+		frame3.add(btnRegresar);
 		
 		frame3.add(jspPaciente);
 		
-		lblId.setBounds(20, 20, 100, 20);
-		txtId.setBounds(150,20,200,20);
 		
 		lblNombre.setBounds(20,50,100,20);
 		txtNombre.setBounds(150,50,200,20);
@@ -321,37 +350,11 @@ public class FrmPrueba{
 		btnGuardar.setBounds(390, 100, 100, 25);
 		btnNuevo.setBounds(390, 140, 100, 25);
 		btnDelete.setBounds(390, 60, 100, 25);
+		btnRegresar.setBounds(390, 180, 100, 25);
 		
 		jspPaciente.setBounds(20,300,550,200);
 		
-		
-		/*
-		btnGuardar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				btnGuardarActionPerformed(evt);
-			}
-		});
-		*/
-		/*
-		btnNuevo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				btnNuevoActionPerformed(evt);
-			}
-		});
-		
-		btnDelete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				btnEliminarActionPerformed(evt);
-			}
-		});
-		/*
-		tblPaciente.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent evt) {
-				tblPruebaMouseClicked(evt);
-			}
-		});
-		mostrar();
-		*/
+		mostrar_tablaPacientes();
 		
 	}
 	
@@ -367,7 +370,7 @@ public class FrmPrueba{
 	protected void btnDeleteDrEvent(ActionEvent evt) {
 		eliminar_doctor();
 	}
-	
+	/*
 	protected void btnEliminarActionPerformed(ActionEvent evt) {
 		try {
 			con = ConexionAccess.obtenerConexion();
@@ -386,7 +389,7 @@ public class FrmPrueba{
 		}catch(Exception ex){
 			ex.printStackTrace();
 		}
-		mostrar();
+		mostrar_tablaPacientes();
 		txtId.setText("");
 		txtNombre.setText("");
 		txtSangre.setText("");
@@ -410,7 +413,7 @@ public class FrmPrueba{
 		txtAlergias.setText("");
 		txtSintomas.setText("");
 	}
-	
+	*/
 	protected void tblDoctorMouse(MouseEvent evt) {
 		Doctor d1 = new Doctor();
 		int fila = tblDoctor.rowAtPoint(evt.getPoint());
@@ -427,6 +430,10 @@ public class FrmPrueba{
 	
 	protected void mostrar_tablaDr() {
 		ConexionAccess.read_drtbl(tblDoctor);
+	}
+	
+	protected void mostrar_tablaPacientes() {
+		ConexionAccess.read_pttbl(tblPaciente);
 	}
 	/*
 	protected void tblPruebaMouseClicked(MouseEvent evt) {
@@ -478,31 +485,6 @@ public class FrmPrueba{
 		txtEdad.setText("");
 	}
 	*/
-	public void mostrar() {
-		try {
-			con = ConexionAccess.obtenerConexion();
-			DefaultTableModel miModelo = new DefaultTableModel(null, titulos);
-			String dts [] = new String[9];
-			String sql = "select * from " + nombre_tabla;
-			Statement st = con.createStatement();
-			ResultSet rs = st.executeQuery(sql);
-			while(rs.next()) {
-				dts[0] = rs.getString(1);
-				dts[1] = rs.getString(2);
-				dts[2] = rs.getString(3);
-				dts[3] = rs.getString(4);
-				dts[4] = rs.getString(5);
-				dts[5] = rs.getString(6);
-				dts[6] = rs.getString(7);
-				dts[7] = rs.getString(8);
-				dts[8] = rs.getString(9);
-				miModelo.addRow(dts);
-			}
-			tblPaciente.setModel(miModelo);
-		}catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		
-	}
+
 	
 }
