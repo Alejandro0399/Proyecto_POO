@@ -1,7 +1,4 @@
 package proyectoFinal;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -15,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -23,53 +19,96 @@ import javax.swing.table.DefaultTableModel;
 
 public class FrmPrueba{
 	
-	private JTable tblPaciente;
-	private JScrollPane jspPaciente;
-	private DefaultTableModel dtmPaciente;
-	private String titulos [] = {"ID", "Nombre", "Apellidos", "Telefono", "Fecha", "Edad", "Tipo de Sangre", "Alergias", "Sintomas", };
+	private JTable tblPaciente, tblDoctor;
+	private JScrollPane jspPaciente, jspDoctor;
+	private DefaultTableModel dtmPaciente, dtmDoctor;
+	private String titulos_doctor [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
+	private String titulos [] = {"Nombre", "Apellidos", "Telefono", "Fecha", "Edad", "Tipo de Sangre", "Alergias", "Sintomas", };
 	private String nombre_tabla = "Pacientes";
 	
 	private JTextField txtNombre, txtApellidos, txtTelefono, txtFecha, txtId, txtEdad, txtSangre, txtAlergias, txtSintomas;
-	private JLabel lblNombre, lblApellidos, lblTelefono, lblFecha, lblId, lblSangre, lblAlergias, lblSintomas, lblEdad;
-	private JTextField drNombre, drApellidos, drEdad, drDireccion, drEspecialidad;
-	private JLabel lblEspecialidad, lblDireccion;
+	private static JLabel lblNombre;
+	private static JLabel lblApellidos;
+	private static JLabel lblDoctores;
+	private static JLabel lblPacientes;
+	private JLabel lblTelefono;
+	private JLabel lblFecha;
+	private JLabel lblId;
+	private JLabel lblSangre;
+	private JLabel lblAlergias;
+	private JLabel lblSintomas;
+	private static JLabel lblEdad;
+	private static JTextField drNombre;
+	private static JTextField drApellidos;
+	private static JTextField drEdad;
+	private static JTextField drEspecialidad;
+	private static JLabel lblEspecialidad;
 	
-	private JButton btnGuardar, btnNuevo, btnDelete;
-	private JLabel mensaje_bienvenida;
-	private JButton btnPaciente;
+	private JButton btnGuardar, btnNuevo, btnDelete, btnGuardarDr, btnDeleteDr;
+	private JButton btnPaciente, btnRegresar;
 	private JButton btnDoctor;
-	private JPanel panel, panel1, panel2;
 	private Connection con = null;
-	private JFrame frame1, frame2, frame3;
+	private JFrame frame1, frame2, frame3, frame4;
 	
 	public FrmPrueba() {
 		frame1 = new JFrame();
 		frame2 = new JFrame();
 		frame3 = new JFrame();
+		frame4 = new JFrame();
 		frame1.setVisible(false);
 		frame2.setVisible(false);
 		frame3.setVisible(false);
-		bienvenida_layout();
-	}
-	
-	public void bienvenida_layout() {
-		frame1.setLayout(null);
-		frame1.setTitle("Bienvenido");
-		frame1.setSize(300, 250);
-		frame1.setVisible(true);
-		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mensaje_bienvenida = new JLabel("BIENVENIDOS");
+		frame4.setVisible(false);
+		
+		//Text Fields
+		drNombre = new JTextField();
+		drApellidos = new JTextField();
+		drEdad = new JTextField();;
+		drEspecialidad = new JTextField();
+		txtNombre = new JTextField();
+		txtApellidos = new JTextField();
+		txtTelefono = new JTextField();
+		txtFecha = new JTextField();
+		txtId = new JTextField();
+		txtSangre = new JTextField();
+		txtAlergias = new JTextField();
+		txtSintomas = new JTextField();
+		txtEdad = new JTextField();
+		
+		//Botones
+		btnGuardarDr = new JButton("Guardar");
+		btnGuardar = new JButton("Guardar");
 		btnPaciente = new JButton("Agendar Cita");
 		btnDoctor = new JButton("Dar de alta a Doctor");
+		btnGuardar = new JButton("Guardar");
+		btnNuevo = new JButton("Limpiar");
+		btnDelete = new JButton("Eliminar");
+		btnDeleteDr = new JButton("Eliminar Doctor");
+		btnRegresar = new JButton("Regresar");
 		
-		frame1.add(mensaje_bienvenida);
-		frame1.add(btnPaciente);
-		frame1.add(btnDoctor);
+		//Labels
+		lblNombre = new JLabel("Nombre:");
+		lblApellidos = new JLabel("Apellidos:");
+		lblEdad = new JLabel("Edad:");
+		lblEspecialidad = new JLabel("Especialidad:");
+		lblTelefono = new JLabel("Telefono:");
+		lblId = new JLabel("ID:");
+		lblSangre = new JLabel("Tipo de Sangre:");
+		lblAlergias = new JLabel("Alergias:");
+		lblSintomas = new JLabel("Sintomas:");
+		lblFecha = new JLabel("Fecha(dd/mm/yyyy):");
+		lblDoctores = new JLabel("DOCTORES");
+		lblPacientes = new JLabel("PACIENTES");
 		
-		mensaje_bienvenida.setBounds(100,50,100,25);
-		btnPaciente.setBounds(75, 80, 150, 25);
-		btnDoctor.setBounds(75, 120, 150, 25);
+		//Tablas
+		dtmPaciente = new DefaultTableModel(null, titulos);
+		tblPaciente = new JTable(dtmPaciente);
+		jspPaciente = new JScrollPane(tblPaciente);
+		dtmDoctor = new DefaultTableModel(null, titulos_doctor);
+		tblDoctor = new JTable(dtmDoctor);
+		jspDoctor = new JScrollPane(tblDoctor);
 		
+		//Callbacks para acciones
 		btnPaciente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				frame1.setVisible(false);
@@ -83,6 +122,61 @@ public class FrmPrueba{
 				btnDoctorEvent(evt);
 			}
 		});
+		
+		btnGuardarDr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				crear_doctor(frame2);
+				frame2.setVisible(false);
+			}
+		});
+		
+		btnDeleteDr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				frame1.setVisible(false);
+				btnDeleteDrEvent(evt);
+				
+			}
+		});
+		
+		btnRegresar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				frame2.setVisible(false);
+				frame3.setVisible(false);
+				frame4.setVisible(false);
+				empezar_gui();
+			}
+		});
+		
+		tblDoctor.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent evt) {
+				tblDoctorMouse(evt);
+			}
+		});
+		
+	}
+	
+	public void empezar_gui() {
+		bienvenida_layout();
+	}
+	
+	public void bienvenida_layout() {
+		frame1.setLayout(null);
+		frame1.setTitle("Bienvenido");
+		frame1.setSize(450, 400);
+		frame1.setVisible(true);
+		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		frame1.add(btnPaciente);
+		frame1.add(btnDoctor);
+		frame1.add(lblDoctores);
+		frame1.add(lblPacientes);
+		frame1.add(btnDeleteDr);
+		
+		lblDoctores.setBounds(50, 50, 100, 25);
+		lblPacientes.setBounds(250, 50, 100, 25);
+		btnPaciente.setBounds(250, 80, 150, 25);
+		btnDoctor.setBounds(50, 80, 150, 25);
+		btnDeleteDr.setBounds(50, 120, 150, 25);
 	}
 	
 	public void alta_doctor() {
@@ -92,20 +186,11 @@ public class FrmPrueba{
 		frame2.setVisible(true);
 		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		drNombre = new JTextField();
-		drApellidos = new JTextField();
-		drEdad = new JTextField();;
-		drDireccion = new JTextField();
-		drEspecialidad = new JTextField();
-		
-		lblNombre = new JLabel("Nombre:");
-		lblApellidos = new JLabel("Apellidos:");
-		lblEdad = new JLabel("Edad:");
-		lblDireccion = new JLabel("Direccion:");
-		lblEspecialidad = new JLabel("Especialidad:");
-		
-		btnGuardar = new JButton("Guardar");
-		
+		drNombre.setText("");
+		drApellidos.setText("");
+		drEdad.setText("");
+		drEspecialidad.setText("");
+
 		frame2.add(drNombre);
 		frame2.add(lblNombre);
 		
@@ -115,13 +200,10 @@ public class FrmPrueba{
 		frame2.add(drEdad);
 		frame2.add(lblEdad);
 		
-		frame2.add(drDireccion);
-		frame2.add(lblDireccion);
-		
 		frame2.add(drEspecialidad);
 		frame2.add(lblEspecialidad);
 		
-		frame2.add(btnGuardar);
+		frame2.add(btnGuardarDr);
 		
 		lblNombre.setBounds(20,50,100,20);
 		drNombre.setBounds(120,50,200,20);
@@ -129,67 +211,53 @@ public class FrmPrueba{
 		lblApellidos.setBounds(20, 80, 100, 20);	
 		drApellidos.setBounds(120, 80, 200, 20);
 		
-		lblDireccion.setBounds(20,110,100,20);
-		drDireccion.setBounds(120,110,200,20);
+		lblEdad.setBounds(20,110,100,20);
+		drEdad.setBounds(120,110,200,20);
 		
-		lblEdad.setBounds(20,140,100,20);
-		drEdad.setBounds(120,140,200,20);
+		lblEspecialidad.setBounds(20,140,100,20);
+		drEspecialidad.setBounds(120,140,200,20);
 		
-		lblEspecialidad.setBounds(20,170,100,20);
-		drEspecialidad.setBounds(120,170,200,20);
+		btnGuardarDr.setBounds(150, 170, 100, 25);
+	}
+	
+	
+	public void eliminar_doctor() {
+		frame4.setLayout(null);
+		frame4.setTitle("Eliminar Doctor");
+		frame4.setSize(600, 600);
+		frame4.setVisible(true);
+		frame4.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		btnGuardar.setBounds(150, 220, 100, 25);
+		frame4.add(jspDoctor);
+		frame4.add(btnRegresar);
 		
-		btnGuardar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				frame2.setVisible(false);
-				guardar_doctor(evt);
-			}
-		});
+		
+		jspDoctor.setBounds(20, 20, 550, 400);
+		btnRegresar.setBounds(250, 450, 100, 25);
+		mostrar_tablaDr();
+		
 		
 	}
 	
-	public void guardar_doctor(ActionEvent evt) {
-		// Guardar datos
+	public void crear_doctor(JFrame frame) {
+		Doctor d1 = new Doctor(drNombre.getText(), drApellidos.getText(), Integer.parseInt(drEdad.getText().strip()), drEspecialidad.getText());
+		int status = ConexionAccess.guardar_datos(d1);
+		if(status > 0) {
+			JOptionPane.showMessageDialog(frame.getRootPane(), "Datos del doctor guardados");
+		}
+		else if(status == -2) {
+			JOptionPane.showMessageDialog(frame.getRootPane(), "Datos ya se encuentran en la base de datos");
+		}
 		bienvenida_layout();
 	}
-	
+		
 	public void guardar_paciente() {
 		frame3.setLayout(null);
 		frame3.setTitle("Registrar Paciente");
 		frame3.setSize(600, 600);
 		frame3.setVisible(true);
 		frame3.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		btnGuardar = new JButton("Guardar");
-		btnNuevo = new JButton("Limpiar");
-		btnDelete = new JButton("Eliminar");
-		
-		txtNombre = new JTextField();
-		txtApellidos = new JTextField();
-		txtTelefono = new JTextField();
-		txtFecha = new JTextField();
-		txtId = new JTextField();
-		txtSangre = new JTextField();
-		txtAlergias = new JTextField();
-		txtSintomas = new JTextField();
-		txtEdad = new JTextField();
-		
-		lblNombre = new JLabel("Nombre:");
-		lblApellidos = new JLabel("Apellidos:");
-		lblTelefono = new JLabel("Telefono:");
-		lblEdad = new JLabel("Edad:");
-		lblId = new JLabel("ID:");
-		lblSangre = new JLabel("Tipo de Sangre:");
-		lblAlergias = new JLabel("Alergias:");
-		lblSintomas = new JLabel("Sintomas:");
-		lblFecha = new JLabel("Fecha:");
-		
-		dtmPaciente = new DefaultTableModel(null, titulos);
-		tblPaciente = new JTable(dtmPaciente);
-		jspPaciente = new JScrollPane(tblPaciente);
-		
-		
+				
 		frame3.add(lblId);
 		frame3.add(txtId);
 		
@@ -224,32 +292,31 @@ public class FrmPrueba{
 		frame3.add(jspPaciente);
 		
 		lblId.setBounds(20, 20, 100, 20);
-		txtId.setBounds(120,20,200,20);
+		txtId.setBounds(150,20,200,20);
 		
 		lblNombre.setBounds(20,50,100,20);
-		txtNombre.setBounds(120,50,200,20);
+		txtNombre.setBounds(150,50,200,20);
 		
 		lblApellidos.setBounds(20, 80, 100, 20);	
-		txtApellidos.setBounds(120, 80, 200, 20);
+		txtApellidos.setBounds(150, 80, 200, 20);
 		
 		lblTelefono.setBounds(20,110,100,20);
-		txtTelefono.setBounds(120,110,200,20);
+		txtTelefono.setBounds(150,110,200,20);
 		
 		lblEdad.setBounds(20,140,100,20);
-		txtEdad.setBounds(120,140,200,20);
+		txtEdad.setBounds(150,140,200,20);
 		
 		lblSangre.setBounds(20,170,100,20);
-		txtSangre.setBounds(120,170,200,20);
+		txtSangre.setBounds(150,170,200,20);
 		
 		lblAlergias.setBounds(20,200,100,20);
-		txtAlergias.setBounds(120,200,200,20);
+		txtAlergias.setBounds(150,200,200,20);
 		
 		lblSintomas.setBounds(20,230,100,20);
-		txtSintomas.setBounds(120,230,200,20);
+		txtSintomas.setBounds(150,230,200,20);
 		
-		lblFecha.setBounds(20,260,100,20);
-		txtFecha.setBounds(120,260,200,20);
-
+		lblFecha.setBounds(20,260,130,20);
+		txtFecha.setBounds(150,260,200,20);
 		
 		btnGuardar.setBounds(390, 100, 100, 25);
 		btnNuevo.setBounds(390, 140, 100, 25);
@@ -257,7 +324,6 @@ public class FrmPrueba{
 		
 		jspPaciente.setBounds(20,300,550,200);
 		
-		txtFecha.setText("dd/mm/yyyy");
 		
 		/*
 		btnGuardar.addActionListener(new ActionListener() {
@@ -289,12 +355,17 @@ public class FrmPrueba{
 		
 	}
 	
+	//Eventos de botones
 	protected void btnPacienteEvent(ActionEvent evt) {
 		guardar_paciente();
 	}
 	
 	protected void btnDoctorEvent(ActionEvent evt) {
 		alta_doctor();
+	}
+	
+	protected void btnDeleteDrEvent(ActionEvent evt) {
+		eliminar_doctor();
 	}
 	
 	protected void btnEliminarActionPerformed(ActionEvent evt) {
@@ -338,6 +409,24 @@ public class FrmPrueba{
 		txtApellidos.setText("");
 		txtAlergias.setText("");
 		txtSintomas.setText("");
+	}
+	
+	protected void tblDoctorMouse(MouseEvent evt) {
+		Doctor d1 = new Doctor();
+		int fila = tblDoctor.rowAtPoint(evt.getPoint());
+		d1.setNombre(tblDoctor.getValueAt(fila, 0).toString());
+		d1.setApellidos(tblDoctor.getValueAt(fila, 1).toString());
+		d1.setEdad(Integer.parseInt(tblDoctor.getValueAt(fila, 2).toString()));
+		d1.setEspecialidad(tblDoctor.getValueAt(fila, 3).toString());
+		int status = ConexionAccess.delete_data(d1);
+		if(status > 0) {
+			JOptionPane.showMessageDialog(frame4.getRootPane(), "Doctor " + d1.getNombre() + " " + d1.getApellidos() + " eliminado");
+		}		
+		mostrar_tablaDr();
+	}
+	
+	protected void mostrar_tablaDr() {
+		ConexionAccess.read_drtbl(tblDoctor);
 	}
 	/*
 	protected void tblPruebaMouseClicked(MouseEvent evt) {

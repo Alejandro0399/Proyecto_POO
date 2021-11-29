@@ -12,6 +12,10 @@ public class Paciente extends Persona{
 		setSintomas(sintomas);
 	}
 	
+	Paciente(){
+		super();
+	}
+	
 	public void setSangre(String sangre) {
 		this.sangre = sangre;
 	}

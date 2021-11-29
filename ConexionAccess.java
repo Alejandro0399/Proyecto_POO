@@ -2,11 +2,21 @@ package proyectoFinal;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 
 public class ConexionAccess {
 
 	protected static Connection con = null;
+	protected static String tabla1 = "Doctores";
+	protected static String tabla2 = "Pacientes";
+	private static String titulos_doctor [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
 	
 	//Driver para conectar con Access
 	private static String driver = "net.ucanaccess.jdbc.UcanaccessDriver";	
@@ -26,6 +36,115 @@ public class ConexionAccess {
 		return con;
 	}
 	
+	public static int revisar_datos(Object o) {
+		try {
+			Connection con1 = obtenerConexion();
+			if(con1 == null) {
+				return -1;
+			}
+			if (o instanceof Doctor) {
+				Doctor d1 = (Doctor) o;
+				String sql = "select * from " + tabla1 ;
+				String dts [] = new String[5];
+				Statement st = con.createStatement();
+				ResultSet rs = st.executeQuery(sql);
+				while(rs.next()) {
+					dts[0] = rs.getString(1);
+					dts[1] = rs.getString(2);	//Nombre
+					dts[2] = rs.getString(3);	//Apellidos
+					dts[3] = rs.getString(4);	//Edad
+					dts[4] = rs.getString(5);	//Especialidad
+					if(d1.getNombre().compareTo(dts[1]) == 0 && d1.getApellidos().compareTo(dts[2]) == 0 && String.valueOf(d1.getEdad()).compareTo(dts[3]) == 0 && d1.getEspecialidad().compareTo(dts[4]) == 0) {
+						return 1;
+					}
+				}
+			}
+			else if(o instanceof Paciente) {
+				System.out.println("Paciente");
+				return 0;
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return -1;
+	}
+	
+	public static int guardar_datos(Object o) {
+		try {
+			Connection con1 = obtenerConexion();
+			if(con1 == null) {
+				return -1;
+			}
+			if (o instanceof Doctor) {
+				Doctor d1 = (Doctor) o;
+				int estado = revisar_datos(d1);
+				if(estado != 1) {
+					String sql = "insert into " + tabla1 + " (Nombre,Apellidos,Edad,Especialidad) values(?,?,?,?)";
+					PreparedStatement pst = con1.prepareStatement(sql);
+					pst.setString(1, d1.getNombre());
+					pst.setString(2, d1.getApellidos());
+					pst.setString(3, String.valueOf(d1.getEdad()));
+					pst.setString(4, d1.getEspecialidad());
+					int n = pst.executeUpdate();
+					return n;
+				}
+				else {
+					return -2;
+				}
+			}
+			else if(o instanceof Paciente) {
+				System.out.println("Paciente");
+				return 0;
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return -1;
+	}
 
+	public static int delete_data(Object o) {
+		try {
+			Connection con1 = obtenerConexion();
+			if (o instanceof Doctor) {
+				Doctor d1 = (Doctor) o;
+				String sql = "delete from " + tabla1 + " where Nombre = ? and Apellidos = ? and Especialidad = ?";
+				PreparedStatement pst = con1.prepareStatement(sql);
+				pst.setString(1, d1.getNombre());
+				pst.setString(2, d1.getApellidos());
+				pst.setString(3, d1.getEspecialidad());
+				int n = pst.executeUpdate();
+				if(n>0) {
+					return n;
+				}
+			}
+			else if(o instanceof Paciente) {
+
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return -1;
+	}
+	
+	public static void read_drtbl(JTable table) {
+		try {
+			Connection c1 = ConexionAccess.obtenerConexion();
+			DefaultTableModel miModelo = new DefaultTableModel(null, titulos_doctor);
+			String dts [] = new String[4];
+			String sql = "select * from " + tabla1;
+			Statement st = c1.createStatement();
+			ResultSet rs = st.executeQuery(sql);
+			while(rs.next()) {
+				dts[0] = rs.getString(2);
+				dts[1] = rs.getString(3);
+				dts[2] = rs.getString(4);
+				dts[3] = rs.getString(5);
+				miModelo.addRow(dts);
+			}
+			table.setModel(miModelo);
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 	
 }

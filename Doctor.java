@@ -2,20 +2,24 @@ package proyectoFinal;
 
 public class Doctor extends Persona {
 	protected String especialidad;
-	protected String direccion;
 	
-	Doctor(String nombre, String apellidos, int edad, String especialidad, String direccion){
+	Doctor(String nombre, String apellidos, int edad, String especialidad){
 		super(nombre, apellidos, edad);
 		setEspecialidad(especialidad);
-		setDireccion(direccion);
+	}
+	
+	Doctor(){
+		super();
 	}
 	
 	public void setEspecialidad(String especialidad) {
 		this.especialidad = especialidad;
 	}
 	
-	public void setDireccion(String direccion) {
-		this.direccion = direccion;
+	
+	public String getEspecialidad() {
+		return this.especialidad;
 	}
+	
 	
 }
