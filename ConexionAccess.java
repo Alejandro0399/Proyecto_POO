@@ -12,9 +12,9 @@ import javax.swing.table.DefaultTableModel;
 public class ConexionAccess {
 
 	protected static Connection con = null;
-	protected static String tabla1 = "Doctores";
-	public static String titulos_doctor [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
-	public static String titulos_pacientes [] = {"Nombre", "Apellidos", "Telefono", "Fecha", "Hora", "Edad", "Sangre", "Alergias", "Sintomas"};
+	protected static final String TABLA = "Doctores";
+	public static final String TITULOS_DOCTOR [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
+	public static final String TITULOS_PACIENTES [] = {"Nombre", "Apellidos", "Telefono", "Fecha", "Hora", "Edad", "Sangre", "Alergias", "Sintomas"};
 	
 	
 	//Driver para conectar con Access
@@ -52,7 +52,7 @@ public class ConexionAccess {
 			}
 			if (o instanceof Doctor) {
 				Doctor d1 = (Doctor) o;
-				String sql = "select * from " + tabla1 ;
+				String sql = "select * from " + TABLA ;
 				String dts [] = new String[5];
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
@@ -126,7 +126,7 @@ public class ConexionAccess {
 				Doctor d1 = (Doctor) o;
 				int estado = revisar_datos(d1);
 				if(estado != 1) {
-					String sql = "insert into " + tabla1 + " (Nombre,Apellidos,Edad,Especialidad) values(?,?,?,?)";
+					String sql = "insert into " + TABLA + " (Nombre,Apellidos,Edad,Especialidad) values(?,?,?,?)";
 					PreparedStatement pst = con1.prepareStatement(sql);
 					pst.setString(1, d1.getNombre());
 					pst.setString(2, d1.getApellidos());
@@ -182,7 +182,7 @@ public class ConexionAccess {
 			Connection con1 = obtenerConexion();
 			if (o instanceof Doctor) {
 				Doctor d1 = (Doctor) o;
-				String sql = "delete from " + tabla1 + " where Nombre = ? and Apellidos = ? and Especialidad = ?";
+				String sql = "delete from " + TABLA + " where Nombre = ? and Apellidos = ? and Especialidad = ?";
 				PreparedStatement pst = con1.prepareStatement(sql);
 				pst.setString(1, d1.getNombre());
 				pst.setString(2, d1.getApellidos());
@@ -217,9 +217,9 @@ public class ConexionAccess {
 	public static void read_drtbl(JTable table) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
-			DefaultTableModel miModelo = new DefaultTableModel(null, titulos_doctor);
+			DefaultTableModel miModelo = new DefaultTableModel(null, TITULOS_DOCTOR);
 			String dts [] = new String[4];
-			String sql = "select * from " + tabla1;
+			String sql = "select * from " + TABLA;
 			Statement st = c1.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 			while(rs.next()) {
@@ -243,7 +243,7 @@ public class ConexionAccess {
 	public static void read_pttbl(JTable table, Doctor d1) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
-			DefaultTableModel miModelo = new DefaultTableModel(null, titulos_pacientes);
+			DefaultTableModel miModelo = new DefaultTableModel(null, TITULOS_PACIENTES);
 			String dts [] = new String[9];
 			String sql = "select * from " + d1.table_format();
 			Statement st = c1.createStatement();
@@ -270,15 +270,15 @@ public class ConexionAccess {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			String sql = "create table " + d1.table_format() + " "
-					+ "(" + titulos_pacientes[0] +" TEXT,"
-					+ titulos_pacientes[1] +" TEXT,"
-					+ titulos_pacientes[2] +" TEXT,"
-					+ titulos_pacientes[3] +" TEXT,"
-					+ titulos_pacientes[4] +" TEXT,"
-					+ titulos_pacientes[5] +" TEXT,"
-					+ titulos_pacientes[6] +" TEXT,"
-					+ titulos_pacientes[7] +" TEXT,"
-					+ titulos_pacientes[8] +" TEXT)";
+					+ "(" + TITULOS_PACIENTES[0] +" TEXT,"
+					+ TITULOS_PACIENTES[1] +" TEXT,"
+					+ TITULOS_PACIENTES[2] +" TEXT,"
+					+ TITULOS_PACIENTES[3] +" TEXT,"
+					+ TITULOS_PACIENTES[4] +" TEXT,"
+					+ TITULOS_PACIENTES[5] +" TEXT,"
+					+ TITULOS_PACIENTES[6] +" TEXT,"
+					+ TITULOS_PACIENTES[7] +" TEXT,"
+					+ TITULOS_PACIENTES[8] +" TEXT)";
 			Statement pst = c1.createStatement();
 			pst.execute(sql);
 		}catch(Exception ex) {
@@ -310,7 +310,7 @@ public class ConexionAccess {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			String dts [] = new String[4];
-			String sql = "select * from " + tabla1;
+			String sql = "select * from " + TABLA;
 			Statement st = c1.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 			while(rs.next()) {

@@ -4,6 +4,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,7 +18,7 @@ public class Gui{
 	private JTable tblPaciente, tblDoctor, tblCita;
 	private JScrollPane jspPaciente, jspDoctor, jspCita;
 	private DefaultTableModel dtmPaciente, dtmDoctor, dtmCita;
-	private static JTextField drNombre, drApellidos, drEdad, txtNombre, drEspecialidad, txtApellidos, txtTelefono, txtFecha, txtEdad, txtSangre, txtAlergias, txtSintomas, txtHora;
+	private static JTextField drNombre, drApellidos, drEdad, txtNombre, txtApellidos, txtTelefono, txtFecha, txtEdad, txtSangre, txtAlergias, txtSintomas, txtHora;
 	private JLabel lblAlergias, lblEspecialidad, lblSeleccion, lblSintomas, lblEdad, lblNombre, lblApellidos, lblDoctores, lblPacientes, lblHora, lblTelefono, lblFecha, lblSangre;
 
 	
@@ -25,6 +26,8 @@ public class Gui{
 	private JFrame frame1, frame2, frame3, frame4, frame5;
 	private Doctor doctor;
 	private static Date fecha_referencia = Date.previousDate(new Date());
+	private static JComboBox<String> combo1;
+	private static String especialidad;
 	
 	/**
 	 * Constructor de la GUI, genera todos los componentes que se van a usar en la GUI
@@ -41,11 +44,13 @@ public class Gui{
 		frame4.setVisible(false);
 		frame5.setVisible(false);
 		
+		//Combo box para mostrar especialidades
+		combo1 = new JComboBox<String>();
+		
 		//Text Fields
 		drNombre = new JTextField();
 		drApellidos = new JTextField();
 		drEdad = new JTextField();;
-		drEspecialidad = new JTextField();
 		txtNombre = new JTextField();
 		txtApellidos = new JTextField();
 		txtTelefono = new JTextField();
@@ -84,13 +89,13 @@ public class Gui{
 		lblSeleccion = new JLabel("Selecciona a un doctor para generar tu cita");
 		
 		//Tablas
-		dtmPaciente = new DefaultTableModel(null, ConexionAccess.titulos_pacientes);
+		dtmPaciente = new DefaultTableModel(null, ConexionAccess.TITULOS_PACIENTES);
 		tblPaciente = new JTable(dtmPaciente);
 		jspPaciente = new JScrollPane(tblPaciente);
-		dtmDoctor = new DefaultTableModel(null, ConexionAccess.titulos_doctor);
+		dtmDoctor = new DefaultTableModel(null, ConexionAccess.TITULOS_DOCTOR);
 		tblDoctor = new JTable(dtmDoctor);
 		jspDoctor = new JScrollPane(tblDoctor);
-		dtmCita = new DefaultTableModel(null, ConexionAccess.titulos_doctor);
+		dtmCita = new DefaultTableModel(null, ConexionAccess.TITULOS_DOCTOR);
 		tblCita = new JTable(dtmCita);
 		jspCita = new JScrollPane(tblCita);
 		
@@ -178,6 +183,11 @@ public class Gui{
 				guardar_paciente();
 			}
 		});
+		combo1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				select_especialidad();
+			}
+		});
 		
 	}
 	
@@ -226,10 +236,7 @@ public class Gui{
 		frame2.setVisible(true);
 		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		drNombre.setText("");
-		drApellidos.setText("");
-		drEdad.setText("");
-		drEspecialidad.setText("");
+		limpiar_pantalla_doctor();
 
 		frame2.add(drNombre);
 		frame2.add(lblNombre);
@@ -240,8 +247,13 @@ public class Gui{
 		frame2.add(drEdad);
 		frame2.add(lblEdad);
 		
-		frame2.add(drEspecialidad);
 		frame2.add(lblEspecialidad);
+		
+		frame2.add(combo1);
+		for(int i = 0; i < Especialidades.values().length; i++) {
+			combo1.addItem(Especialidades.values()[i].toString());
+		}
+		
 		
 		frame2.add(btnGuardarDr);
 		frame2.add(btnRegresar);
@@ -256,7 +268,8 @@ public class Gui{
 		drEdad.setBounds(120,110,200,20);
 		
 		lblEspecialidad.setBounds(20,140,100,20);
-		drEspecialidad.setBounds(120,140,200,20);
+		combo1.setBounds(120,140,200,20);
+		
 		
 		btnGuardarDr.setBounds(150, 170, 100, 25);
 		btnRegresar.setBounds(150, 210, 100, 25);
@@ -392,7 +405,7 @@ public class Gui{
 	 * Metodo utilizado para registrar al doctor en la base de datos
 	 */
 	public void crear_doctor(JFrame frame) {
-		Doctor d1 = new Doctor(drNombre.getText(), drApellidos.getText(), Integer.parseInt(drEdad.getText().strip()), drEspecialidad.getText());
+		Doctor d1 = new Doctor(drNombre.getText(), drApellidos.getText(), Integer.parseInt(drEdad.getText().strip()), especialidad);
 		int status = ConexionAccess.guardar_datos(d1);
 		if(status > 0) {
 			JOptionPane.showMessageDialog(frame.getRootPane(), "Datos del doctor guardados");
@@ -436,6 +449,10 @@ public class Gui{
 		mostrar_tablaPacientes();
 	}
 	
+	public static void select_especialidad() {
+		especialidad = (String) combo1.getSelectedItem();
+	}
+	
 	/**
 	 * Metodo que se usa para poner en la gui la una tabla
 	 * @param tabla, se especifica que tabla se quiere mostrar
@@ -475,7 +492,6 @@ public class Gui{
 		drNombre.setText("");
 		drApellidos.setText("");
 		drEdad.setText("");
-		drEspecialidad.setText("");
 	}
 	
 	/**
