@@ -5,15 +5,13 @@ public class Paciente extends Persona{
 	public String alergias;
 	public String sintomas;
 	public String telefono;
-	public Date fecha;
 	
-	Paciente(String nombre, String apellidos, int edad, String sangre, String alergias, String sintomas, String telefono, Date fecha){
+	Paciente(String nombre, String apellidos, int edad, String sangre, String alergias, String sintomas, String telefono){
 		super(nombre, apellidos, edad);
 		setSangre(sangre);
 		setAlergias(alergias);
 		setSintomas(sintomas);
 		setTelefono(telefono);
-		setFecha(fecha);
 	}
 	
 	Paciente(){
@@ -24,9 +22,6 @@ public class Paciente extends Persona{
 		return this.telefono;
 	}
 	
-	public Date getFecha() {
-		return this.fecha;
-	}
 	
 	public String getSangre() {
 		return this.sangre;
@@ -44,10 +39,6 @@ public class Paciente extends Persona{
 		this.telefono = telefono;
 	}
 	
-	public void setFecha(Date fecha) {
-		this.fecha = fecha;
-	}
-	
 	public void setSangre(String sangre) {
 		this.sangre = sangre;
 	}
@@ -58,5 +49,9 @@ public class Paciente extends Persona{
 	
 	public void setSintomas(String sintomas) {
 		this.sintomas = sintomas;
+	}
+	
+	public String toString() {
+		return this.getNombre() + " " + this.getApellidos();
 	}
 }

@@ -7,11 +7,8 @@ public class Date implements Comparable<Date> {
 	private int year = 1;
 	public static final int MIN_YEAR;
 	public static final int MAX_YEAR;
-	private String mName;
-	private final static String mon_name[] = {"January", "February", "March",
-			"April", "May", "June", "July", "August", "September",
-			"October", "November", "December"};
-	
+
+
 	static {
 		MIN_YEAR = 0;
 		MAX_YEAR = 3000;
@@ -37,7 +34,7 @@ public class Date implements Comparable<Date> {
 	public void set_month(int month) {
 		if(isValidDate(day, month, year)) {
 			this.month = month;
-			mName = mon_name[month];
+			//mName = mon_name[month];
 		}
 	}
 	
@@ -62,9 +59,6 @@ public class Date implements Comparable<Date> {
 		return month;
 	}
 	
-	public String get_mName() {
-		return mName;
-	}
 	public static boolean isLeap(int year) {
 		if(year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)) {
 			return true;
@@ -74,7 +68,7 @@ public class Date implements Comparable<Date> {
 		}
 	}
 		
-	public boolean isValidDate(int day, int month, int year) {
+	public static boolean isValidDate(int day, int month, int year) {
 		if (month > 0 && month <= 12) {
 			switch(month) {
 			case 1:
@@ -124,6 +118,38 @@ public class Date implements Comparable<Date> {
 		return false;
 	}
 	
+	public static Date previousDate(Date fecha) {
+		int dia, mes, year;
+		//Checar si el dia es primero de enero
+		if(fecha.get_day() == 1 && fecha.get_month() == 1) {
+			dia = 31;
+			mes = 12;
+			year = fecha.get_year()-1;
+		}
+		else if(fecha.get_day() == 1) {
+			mes = fecha.get_month() - 1;
+			year = fecha.get_year();
+			if(isValidDate(31, mes, fecha.get_year())) {
+				dia = 31;
+			}
+			else if(isValidDate(33, mes, fecha.get_year())) {
+				dia = 30;
+			}
+			else if(isValidDate(28, mes, fecha.get_year())) {
+				dia = 28;
+			}
+			else{
+				dia = 29;
+			}
+		}
+		else {
+			dia = fecha.get_day()-1;
+			year = fecha.get_year();
+			mes = fecha.get_month();
+		}
+		Date d1 = new Date(dia, mes, year);
+		return d1;
+	}
 	
 	public String toString() {
 		if(this.month >= 10) {

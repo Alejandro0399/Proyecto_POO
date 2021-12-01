@@ -21,5 +21,12 @@ public class Doctor extends Persona {
 		return this.especialidad;
 	}
 	
+	public String toString() {
+		return this.getNombre() + " " + this.getApellidos();
+	}
+	
+	public String table_format() {
+		return this.getNombre() + "_" + this.getApellidos().replace(" ", "_");
+	}
 	
 }

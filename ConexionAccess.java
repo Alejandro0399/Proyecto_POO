@@ -5,8 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
@@ -15,16 +13,19 @@ public class ConexionAccess {
 
 	protected static Connection con = null;
 	protected static String tabla1 = "Doctores";
-	protected static String tabla2 = "Pacientes";
-	private static String titulos_doctor [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
-	private static String titulos_pacientes [] = {"Nombre", "Apellidos", "Telefono", "Fecha", "Edad", "Tipo de Sangre", "Alergias", "Sintomas", };
-
+	public static String titulos_doctor [] = {"Nombre", "Apellidos", "Edad", "Especialidad"};
+	public static String titulos_pacientes [] = {"Nombre", "Apellidos", "Telefono", "Fecha", "Hora", "Edad", "Sangre", "Alergias", "Sintomas"};
+	
 	
 	//Driver para conectar con Access
 	private static String driver = "net.ucanaccess.jdbc.UcanaccessDriver";	
 	//URL en el cual se encuentra el path de la base de datos
 	private static String url = "jdbc:ucanaccess://C:\\Users\\Alejandro\\Documents\\BaseDatos\\ProyectoFinal.accdb";
 	
+	/**
+	 * Funcion que se usa para establecer una conexion con la base de datos
+	 * @return
+	 */
 	public static Connection obtenerConexion() {
 		try {
 			if(con == null) {
@@ -38,6 +39,11 @@ public class ConexionAccess {
 		return con;
 	}
 	
+	/**
+	 * Funcion que se usa para revisar si los datos ya estan en la base de datos
+	 * @param o, Objeto en el cual se quieren revisar los datos
+	 * @return
+	 */
 	public static int revisar_datos(Object o) {
 		try {
 			Connection con1 = obtenerConexion();
@@ -61,7 +67,42 @@ public class ConexionAccess {
 					}
 				}
 			}
-			else if(o instanceof Paciente) {
+			else if(o instanceof Cita) {
+				Cita c1 = (Cita) o;
+				Paciente p1 = c1.getPaciente();
+				Doctor d1 = c1.getDoctor();
+				DateTime fecha = c1.getFecha();
+				String sql = "select * from " + d1.table_format();
+				String dts [] = new String[9];
+				Statement st = con.createStatement();
+				ResultSet rs = st.executeQuery(sql);
+				while(rs.next()) {
+					dts[0] = rs.getString(1);	//Nombre
+					dts[1] = rs.getString(2);	//Apellidos
+					dts[2] = rs.getString(3);	//Telefono
+					dts[3] = rs.getString(4);	//Fecha
+					dts[4] = rs.getString(5);	//Hora
+					dts[5] = rs.getString(6);	//Edad
+					dts[6] = rs.getString(7);	//Sangre
+					dts[7] = rs.getString(8);	//Alergias
+					dts[8] = rs.getString(9);	//Sintomas
+					String fecha_st [] = dts[3].split("/");
+					Date tmp = new Date(Integer.parseInt(fecha_st[0]), Integer.parseInt(fecha_st[1]), Integer.parseInt(fecha_st[2]));
+					int hora = Integer.parseInt(dts[4].split(":")[0]);
+					int minuto = Integer.parseInt(dts[4].split(":")[1]);
+					if(p1.getNombre().compareTo(dts[0]) == 0 && p1.getApellidos().compareTo(dts[1]) == 0) {
+						p1.setAlergias(dts[7]);
+						p1.setTelefono(dts[2]);
+						p1.setSintomas(dts[8]);
+						c1.setFecha(new DateTime(tmp.get_day(), tmp.get_month(), tmp.get_year(), hora, minuto, 0));
+						p1.setEdad(Integer.parseInt(dts[5]));
+						p1.setSangre(dts[6]);
+						return 1;
+					}
+					else if(fecha.compareTo(tmp) == 0 && fecha.getHour() == hora && fecha.getMinute() == minuto) {
+						return 2;
+					}
+				}
 				return 0;
 			}
 		}catch(Exception ex) {
@@ -70,6 +111,11 @@ public class ConexionAccess {
 		return -1;
 	}
 	
+	/**
+	 * Metodo que se usa para guardar los datos en la bade de datos
+	 * @param o, Objeto que se quiere guardar en la base de datos
+	 * @return
+	 */
 	public static int guardar_datos(Object o) {
 		try {
 			Connection con1 = obtenerConexion();
@@ -87,31 +133,37 @@ public class ConexionAccess {
 					pst.setString(3, String.valueOf(d1.getEdad()));
 					pst.setString(4, d1.getEspecialidad());
 					int n = pst.executeUpdate();
+					create_table(d1);
 					return n;
 				}
 				else {
 					return -2;
 				}
 			}
-			else if(o instanceof Paciente) {
-				Paciente p1 = (Paciente) o;
-				int estado = revisar_datos(p1);
-				if(estado != 1) {
-					String sql = "insert into " + tabla2 + " (Nombre,Apellidos,Telefono,Fecha,Edad,Sangre,Alergias,Sintomas) values(?,?,?,?,?,?,?,?)";
+			else if(o instanceof Cita) {
+				Cita c1 = (Cita) o;
+				int estado = revisar_datos(c1);
+				String hora_string = c1.getFecha().getHour() + ":" + c1.getFecha().getMinute();
+				if(estado != 1 && estado != 2) {
+					String sql = "insert into " + c1.getDoctor().table_format() + " (Nombre,Apellidos,Telefono,Fecha,Hora,Edad,Sangre,Alergias,Sintomas) values(?,?,?,?,?,?,?,?,?)";
 					PreparedStatement pst = con1.prepareStatement(sql);
-					pst.setString(1, p1.getNombre());
-					pst.setString(2, p1.getApellidos());
-					pst.setString(3, p1.getTelefono());
-					pst.setString(4, p1.getFecha().toString());
-					pst.setString(5, String.valueOf(p1.getEdad()));
-					pst.setString(6, p1.getSangre());
-					pst.setString(7, p1.getAlergias());
-					pst.setString(8, p1.getSintomas());
+					pst.setString(1, c1.getPaciente().getNombre());
+					pst.setString(2, c1.getPaciente().getApellidos());
+					pst.setString(3, c1.getPaciente().getTelefono());
+					pst.setString(4, c1.getFecha().toString());
+					pst.setString(5, hora_string);
+					pst.setString(6, String.valueOf(c1.getPaciente().getEdad()));
+					pst.setString(7, c1.getPaciente().getSangre());
+					pst.setString(8, c1.getPaciente().getAlergias());
+					pst.setString(9, c1.getPaciente().getSintomas());
 					int n = pst.executeUpdate();
 					return n;
 				}
-				else {
+				else if(estado == 1){
 					return -2;
+				}
+				else {
+					return -3;
 				}
 			}
 		}catch(Exception ex) {
@@ -119,7 +171,12 @@ public class ConexionAccess {
 		}
 		return -1;
 	}
-
+	
+	/**
+	 * Metodo que se usa para eliminar datos de una base de datos
+	 * @param o, objeto que se desea eliminar de la base de datos
+	 * @return
+	 */
 	public static int delete_data(Object o) {
 		try {
 			Connection con1 = obtenerConexion();
@@ -132,11 +189,20 @@ public class ConexionAccess {
 				pst.setString(3, d1.getEspecialidad());
 				int n = pst.executeUpdate();
 				if(n>0) {
+					delete_table(d1);
 					return n;
 				}
 			}
-			else if(o instanceof Paciente) {
-
+			else if(o instanceof Cita) {
+				Cita cita = (Cita) o;
+				String sql = "delete from " + cita.getDoctor().table_format()+ " where Nombre = ? and Apellidos = ?";
+				PreparedStatement pst = con1.prepareStatement(sql);
+				pst.setString(1, cita.getPaciente().getNombre());
+				pst.setString(2, cita.getPaciente().getApellidos());
+				int n = pst.executeUpdate();
+				if(n > 0) {
+					return n;
+				}
 			}
 		}catch(Exception ex) {
 			ex.printStackTrace();
@@ -144,6 +210,10 @@ public class ConexionAccess {
 		return -1;
 	}
 	
+	/**
+	 * Metodo que se usa para leer la tabla de los doctores en la base de datos
+	 * @param table, tabla en donde se va a desplegar la informacion
+	 */
 	public static void read_drtbl(JTable table) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
@@ -165,29 +235,128 @@ public class ConexionAccess {
 		}
 	}
 	
-	public static void read_pttbl(JTable table) {
+	/**
+	 * Metodo que se usa para desplegar la tabla de citas
+	 * @param table, Tabla donde se va a desplegar la informacion
+	 * @param d1, Doctor del que se quiere consultar la tabla
+	 */
+	public static void read_pttbl(JTable table, Doctor d1) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			DefaultTableModel miModelo = new DefaultTableModel(null, titulos_pacientes);
-			String dts [] = new String[8];
-			String sql = "select * from " + tabla2;
+			String dts [] = new String[9];
+			String sql = "select * from " + d1.table_format();
 			Statement st = c1.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 			while(rs.next()) {
-				dts[0] = rs.getString(2);
-				dts[1] = rs.getString(3);
-				dts[2] = rs.getString(4);
-				dts[3] = rs.getString(5);
-				dts[4] = rs.getString(6);
-				dts[5] = rs.getString(7);
-				dts[6] = rs.getString(8);
-				dts[7] = rs.getString(9);
+				dts[0] = rs.getString(1);
+				dts[1] = rs.getString(2);
+				dts[2] = rs.getString(3);
+				dts[3] = rs.getString(4);
+				dts[4] = rs.getString(5);
+				dts[5] = rs.getString(6);
+				dts[6] = rs.getString(7);
+				dts[7] = rs.getString(8);
+				dts[8] = rs.getString(9);
 				miModelo.addRow(dts);
 			}
 			table.setModel(miModelo);
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public static void create_table(Doctor d1) {
+		try {
+			Connection c1 = ConexionAccess.obtenerConexion();
+			String sql = "create table " + d1.table_format() + " "
+					+ "(" + titulos_pacientes[0] +" TEXT,"
+					+ titulos_pacientes[1] +" TEXT,"
+					+ titulos_pacientes[2] +" TEXT,"
+					+ titulos_pacientes[3] +" TEXT,"
+					+ titulos_pacientes[4] +" TEXT,"
+					+ titulos_pacientes[5] +" TEXT,"
+					+ titulos_pacientes[6] +" TEXT,"
+					+ titulos_pacientes[7] +" TEXT,"
+					+ titulos_pacientes[8] +" TEXT)";
+			Statement pst = c1.createStatement();
+			pst.execute(sql);
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Elimina una tabla de la base de datos
+	 * @param d1, Doctor del cual se quiere eliminar la tabla
+	 */
+	public static void delete_table(Doctor d1) {
+		try {
+			Connection c1 = ConexionAccess.obtenerConexion();
+			String sql = "drop table " + d1.table_format();
+			Statement pst = c1.createStatement();
+			pst.execute(sql);
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Metodo que se utiliza para eliminar las citas de un dia anterior de la base de datos
+	 * @param fecha
+	 * @return
+	 */
+	public static int citas_previas(Date fecha) {
+		try {
+			Connection c1 = ConexionAccess.obtenerConexion();
+			String dts [] = new String[4];
+			String sql = "select * from " + tabla1;
+			Statement st = c1.createStatement();
+			ResultSet rs = st.executeQuery(sql);
+			while(rs.next()) {
+				dts[0] = rs.getString(2); 
+				dts[1] = rs.getString(3);
+				dts[2] = rs.getString(4);
+				dts[3] = rs.getString(5);
+				Doctor tmp = new Doctor();
+				tmp.setNombre(dts[0]);
+				tmp.setApellidos(dts[1]);
+				String sql2 = "delete from " + tmp.table_format() + " where fecha=?";
+				PreparedStatement pst = c1.prepareStatement(sql2);
+				pst.setString(1, fecha.toString());
+				int n = pst.executeUpdate();
+				if(n > 0) {
+					return n;
+				}
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return -1;
+	}
+	
+	/**
+	 * Metodo que se usa para actualizar una cita
+	 * @param cita, cita a actualizar
+	 * @return
+	 */
+	public static int update(Cita cita) {
+		try {
+			Connection c1 = ConexionAccess.obtenerConexion();
+			String sql = "update " + cita.getDoctor().table_format() + " set fecha = ?, hora = ? where Nombre=? and Apellidos=?";
+			PreparedStatement pst = c1.prepareStatement(sql);
+			pst.setString(1, cita.getFecha().toString());
+			pst.setString(2, cita.getFecha().getHour() + ":" + cita.getFecha().getMinute());
+			pst.setString(3, cita.getPaciente().getNombre());
+			pst.setString(4, cita.getPaciente().getApellidos());
+			int n = pst.executeUpdate();
+			if(n > 0) {
+				return n;
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return -1;
 	}
 	
 }
