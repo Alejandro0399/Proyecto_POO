@@ -39,6 +39,13 @@ public class DateTime extends Date{
 	public int getHour() { return hour; }
 	public int getMinute() { return minute; }
 	public int getSecond() { return second; }
+	
+	public String formato() {
+		if(this.getMinute() > 10) {
+			return this.getHour() + ":" + this.getMinute();
+		}
+		return this.getHour() + ":0" + this.getMinute();
+	}
 
 	
 }

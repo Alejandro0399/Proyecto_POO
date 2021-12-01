@@ -80,7 +80,7 @@ public class Gui{
 		lblFecha = new JLabel("Fecha(dd/mm/yyyy):");
 		lblDoctores = new JLabel("DOCTORES");
 		lblPacientes = new JLabel("PACIENTES");
-		lblHora = new JLabel("Hora:");
+		lblHora = new JLabel("Hora(formato 24h):");
 		lblSeleccion = new JLabel("Selecciona a un doctor para generar tu cita");
 		
 		//Tablas
@@ -194,7 +194,7 @@ public class Gui{
 	public void bienvenida_layout() {
 		frame1.setLayout(null);
 		frame1.setTitle("Bienvenido");
-		frame1.setSize(450, 400);
+		frame1.setSize(450, 350);
 		frame1.setVisible(true);
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -204,11 +204,11 @@ public class Gui{
 		frame1.add(lblPacientes);
 		frame1.add(btnDeleteDr);
 		
-		lblDoctores.setBounds(50, 50, 100, 25);
-		btnDoctor.setBounds(50, 80, 150, 25);
-		btnDeleteDr.setBounds(50, 120, 150, 25);
-		lblPacientes.setBounds(50, 200, 100, 25);
-		btnPaciente.setBounds(50, 230, 150, 25);
+		lblDoctores.setBounds(130, 50, 100, 25);
+		btnDoctor.setBounds(130, 80, 150, 25);
+		btnDeleteDr.setBounds(130, 120, 150, 25);
+		lblPacientes.setBounds(130, 170, 100, 25);
+		btnPaciente.setBounds(130, 200, 150, 25);
 		
 		int status= ConexionAccess.citas_previas(fecha_referencia);
 		if(status > 0) {
@@ -384,7 +384,7 @@ public class Gui{
 		
 		jspCita.setBounds(20, 50, 550, 400);
 		lblSeleccion.setBounds(180, 20, 300, 20);
-		btnRegresar.setBounds(250, 450, 100, 25);
+		btnRegresar.setBounds(250, 480, 100, 25);
 		mostrar_tablaDr(tblCita);
 	}
 	
@@ -473,7 +473,7 @@ public class Gui{
 		txtApellidos.setText(p1.getApellidos());
 		txtTelefono.setText(p1.getTelefono());
 		txtFecha.setText(c1.getFecha().toString());
-		txtHora.setText(c1.getFecha().getHour() + ":" + c1.getFecha().getMinute());
+		txtHora.setText(c1.getFecha().formato());
 		txtEdad.setText(String.valueOf(p1.getEdad()));
 		txtSangre.setText(p1.getSangre());
 		txtAlergias.setText(p1.getAlergias());

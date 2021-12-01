@@ -143,7 +143,7 @@ public class ConexionAccess {
 			else if(o instanceof Cita) {
 				Cita c1 = (Cita) o;
 				int estado = revisar_datos(c1);
-				String hora_string = c1.getFecha().getHour() + ":" + c1.getFecha().getMinute();
+				String hora_string = c1.getFecha().formato();
 				if(estado != 1 && estado != 2) {
 					String sql = "insert into " + c1.getDoctor().table_format() + " (Nombre,Apellidos,Telefono,Fecha,Hora,Edad,Sangre,Alergias,Sintomas) values(?,?,?,?,?,?,?,?,?)";
 					PreparedStatement pst = con1.prepareStatement(sql);
@@ -346,7 +346,7 @@ public class ConexionAccess {
 			String sql = "update " + cita.getDoctor().table_format() + " set fecha = ?, hora = ? where Nombre=? and Apellidos=?";
 			PreparedStatement pst = c1.prepareStatement(sql);
 			pst.setString(1, cita.getFecha().toString());
-			pst.setString(2, cita.getFecha().getHour() + ":" + cita.getFecha().getMinute());
+			pst.setString(2, cita.getFecha().formato());
 			pst.setString(3, cita.getPaciente().getNombre());
 			pst.setString(4, cita.getPaciente().getApellidos());
 			int n = pst.executeUpdate();
