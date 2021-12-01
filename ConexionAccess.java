@@ -307,6 +307,7 @@ public class ConexionAccess {
 	 * @return
 	 */
 	public static int citas_previas(Date fecha) {
+		int n = 0;
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			String dts [] = new String[4];
@@ -321,10 +322,33 @@ public class ConexionAccess {
 				Doctor tmp = new Doctor();
 				tmp.setNombre(dts[0]);
 				tmp.setApellidos(dts[1]);
-				String sql2 = "delete from " + tmp.table_format() + " where fecha=?";
-				PreparedStatement pst = c1.prepareStatement(sql2);
-				pst.setString(1, fecha.toString());
-				int n = pst.executeUpdate();
+				String sql2 = "select * from " + tmp.table_format();
+				Statement st1 = c1.createStatement();
+				ResultSet rs1 = st1.executeQuery(sql2);
+				while(rs1.next()) {
+					String fecha_st = rs1.getString(4);
+					String fecha_arr [] = fecha_st.split("/");
+					Date fecha_eliminar = new Date(Integer.parseInt(fecha_arr[0]), Integer.parseInt(fecha_arr[1]), Integer.parseInt(fecha_arr[2]));
+					if(Integer.parseInt(fecha_arr[2]) < fecha.get_year()) {
+						String sql_del = "delete from " + tmp.table_format() + " where fecha = ?";
+						PreparedStatement pst = c1.prepareStatement(sql_del);
+						pst.setString(1, fecha_eliminar.toString());
+						n = pst.executeUpdate();
+					}
+					else if(Integer.parseInt(fecha_arr[1]) < fecha.get_month()) {
+						String sql_del = "delete from " + tmp.table_format() + " where fecha = ?";
+						PreparedStatement pst = c1.prepareStatement(sql_del);
+						pst.setString(1, fecha_eliminar.toString());
+						n = pst.executeUpdate();
+					}
+					else if(Integer.parseInt(fecha_arr[0]) < fecha.get_day()) {
+						String sql_del = "delete from " + tmp.table_format() + " where fecha = ?";
+						PreparedStatement pst = c1.prepareStatement(sql_del);
+						pst.setString(1, fecha_eliminar.toString());
+						n = pst.executeUpdate();
+					}
+				}
+				//Ejecutar eliminar datos
 				if(n > 0) {
 					return n;
 				}

@@ -1,7 +1,7 @@
 package proyectoFinal;
 
 public enum Especialidades {
-	Pediatra("Pediatria"), Neurologo("Neurologo"), Dermatologo("Dermatologo"), 
+	Pediatra("Pediatra"), Neurologo("Neurologo"), Dermatologo("Dermatologo"), 
 	Cardiologo("Cardiologo"), Rehabilitacion("Medicina de Rehabilitacion"), 
 	Oftalmologia("Oftalmologia"), Ortopedia("Ortopedia"), Urologo("Urologo"), 
 	General("Medico General");

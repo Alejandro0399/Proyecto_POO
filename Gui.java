@@ -25,7 +25,7 @@ public class Gui{
 	private JButton btnUpdate, btnGuardar, btnNuevo, btnDelete, btnGuardarDr, btnDeleteDr, btnDoctor, btnPaciente, btnRegresar;
 	private JFrame frame1, frame2, frame3, frame4, frame5;
 	private Doctor doctor;
-	private static Date fecha_referencia = Date.previousDate(new Date());
+	private static Date fecha_referencia = new Date();
 	private static JComboBox<String> combo1;
 	private static String especialidad;
 	
@@ -222,7 +222,7 @@ public class Gui{
 		
 		int status= ConexionAccess.citas_previas(fecha_referencia);
 		if(status > 0) {
-			JOptionPane.showMessageDialog(frame1.getRootPane(), "Citas del dia anterior eliminadas");
+			JOptionPane.showMessageDialog(frame1.getRootPane(), "Citas anteriores eliminadas");
 		}
 	}
 	
