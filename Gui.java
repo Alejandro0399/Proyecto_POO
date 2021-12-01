@@ -437,6 +437,21 @@ public class Gui{
 	}
 	
 	/**
+	 * Metodo que se usa para poner en la gui la una tabla
+	 * @param tabla, se especifica que tabla se quiere mostrar
+	 */
+	public void mostrar_tablaDr(JTable tabla) {
+		ConexionAccess.read_drtbl(tabla);
+	}
+	
+	/**
+	 * Metodo que se usa para mostrar la informacion de los pacientes en una tabla
+	 */
+	public void mostrar_tablaPacientes() {
+		ConexionAccess.read_pttbl(tblPaciente, doctor);
+	}
+	
+	/**
 	 * Metodo que se usa para limpiar todos los campos en la pantalla de
 	 * crear citas
 	 */
@@ -594,12 +609,6 @@ public class Gui{
 		
 	}
 		
-	protected void mostrar_tablaDr(JTable tabla) {
-		ConexionAccess.read_drtbl(tabla);
-	}
-	
-	protected void mostrar_tablaPacientes() {
-		ConexionAccess.read_pttbl(tblPaciente, doctor);
-	}
+
 
 }
