@@ -52,7 +52,7 @@ public class ConexionAccess {
 			}
 			if (o instanceof Doctor) {
 				Doctor d1 = (Doctor) o;
-				String sql = "select * from " + TABLA ;
+				String sql = "select * from " + TABLA ;	//codigo sql para leer cada linea en la tabla
 				String dts [] = new String[5];
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
@@ -62,6 +62,7 @@ public class ConexionAccess {
 					dts[2] = rs.getString(3);	//Apellidos
 					dts[3] = rs.getString(4);	//Edad
 					dts[4] = rs.getString(5);	//Especialidad
+					//Checar si el doctor ya esta registrado
 					if(d1.getNombre().compareTo(dts[1]) == 0 && d1.getApellidos().compareTo(dts[2]) == 0 && String.valueOf(d1.getEdad()).compareTo(dts[3]) == 0 && d1.getEspecialidad().compareTo(dts[4]) == 0) {
 						return 1;
 					}
@@ -72,7 +73,7 @@ public class ConexionAccess {
 				Paciente p1 = c1.getPaciente();
 				Doctor d1 = c1.getDoctor();
 				DateTime fecha = c1.getFecha();
-				String sql = "select * from " + d1.table_format();
+				String sql = "select * from " + d1.table_format();	//codigo sql para leer cada linea en la tabla
 				String dts [] = new String[9];
 				Statement st = con.createStatement();
 				ResultSet rs = st.executeQuery(sql);
@@ -90,6 +91,7 @@ public class ConexionAccess {
 					Date tmp = new Date(Integer.parseInt(fecha_st[0]), Integer.parseInt(fecha_st[1]), Integer.parseInt(fecha_st[2]));
 					int hora = Integer.parseInt(dts[4].split(":")[0]);
 					int minuto = Integer.parseInt(dts[4].split(":")[1]);
+					//Revisar si ta se tiene un registro con el nombre del paciente
 					if(p1.getNombre().compareTo(dts[0]) == 0 && p1.getApellidos().compareTo(dts[1]) == 0) {
 						p1.setAlergias(dts[7]);
 						p1.setTelefono(dts[2]);
@@ -99,6 +101,7 @@ public class ConexionAccess {
 						p1.setSangre(dts[6]);
 						return 1;
 					}
+					//checar si la fecha seleccionada ya esta en el registro
 					else if(fecha.compareTo(tmp) == 0 && fecha.getHour() == hora && fecha.getMinute() == minuto) {
 						return 2;
 					}
@@ -126,6 +129,7 @@ public class ConexionAccess {
 				Doctor d1 = (Doctor) o;
 				int estado = revisar_datos(d1);
 				if(estado != 1) {
+					//Codigo sql para agregar fila a una tabla
 					String sql = "insert into " + TABLA + " (Nombre,Apellidos,Edad,Especialidad) values(?,?,?,?)";
 					PreparedStatement pst = con1.prepareStatement(sql);
 					pst.setString(1, d1.getNombre());
@@ -145,6 +149,7 @@ public class ConexionAccess {
 				int estado = revisar_datos(c1);
 				String hora_string = c1.getFecha().formato();
 				if(estado != 1 && estado != 2) {
+					//Codigo sql para agregar fila a una tabla
 					String sql = "insert into " + c1.getDoctor().table_format() + " (Nombre,Apellidos,Telefono,Fecha,Hora,Edad,Sangre,Alergias,Sintomas) values(?,?,?,?,?,?,?,?,?)";
 					PreparedStatement pst = con1.prepareStatement(sql);
 					pst.setString(1, c1.getPaciente().getNombre());
@@ -182,6 +187,7 @@ public class ConexionAccess {
 			Connection con1 = obtenerConexion();
 			if (o instanceof Doctor) {
 				Doctor d1 = (Doctor) o;
+				//Codigo sql para eliminar de una tabla
 				String sql = "delete from " + TABLA + " where Nombre = ? and Apellidos = ? and Especialidad = ?";
 				PreparedStatement pst = con1.prepareStatement(sql);
 				pst.setString(1, d1.getNombre());
@@ -195,6 +201,7 @@ public class ConexionAccess {
 			}
 			else if(o instanceof Cita) {
 				Cita cita = (Cita) o;
+				//Codigo sql para eliminar dato de una tabla
 				String sql = "delete from " + cita.getDoctor().table_format()+ " where Nombre = ? and Apellidos = ?";
 				PreparedStatement pst = con1.prepareStatement(sql);
 				pst.setString(1, cita.getPaciente().getNombre());
@@ -219,7 +226,7 @@ public class ConexionAccess {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			DefaultTableModel miModelo = new DefaultTableModel(null, TITULOS_DOCTOR);
 			String dts [] = new String[4];
-			String sql = "select * from " + TABLA;
+			String sql = "select * from " + TABLA;	//Codigo sql para leer linea en una tabla
 			Statement st = c1.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 			while(rs.next()) {
@@ -245,7 +252,7 @@ public class ConexionAccess {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			DefaultTableModel miModelo = new DefaultTableModel(null, TITULOS_PACIENTES);
 			String dts [] = new String[9];
-			String sql = "select * from " + d1.table_format();
+			String sql = "select * from " + d1.table_format();	//Codigo sql para leer linea en una tabla
 			Statement st = c1.createStatement();
 			ResultSet rs = st.executeQuery(sql);
 			while(rs.next()) {
@@ -266,9 +273,14 @@ public class ConexionAccess {
 		}
 	}
 	
+	/**
+	 * Crear tabla en base de datos con el nomre del doctor
+	 * @param d1, doctor que se va a usar para crear la tabla
+	 */
 	public static void create_table(Doctor d1) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
+			//Codigo sql para crear una nueva tabla en la base de datos
 			String sql = "create table " + d1.table_format() + " "
 					+ "(" + TITULOS_PACIENTES[0] +" TEXT,"
 					+ TITULOS_PACIENTES[1] +" TEXT,"
@@ -293,6 +305,7 @@ public class ConexionAccess {
 	public static void delete_table(Doctor d1) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
+			//Codigo sql para eliminar una tabla
 			String sql = "drop table " + d1.table_format();
 			Statement pst = c1.createStatement();
 			pst.execute(sql);
@@ -311,6 +324,7 @@ public class ConexionAccess {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
 			String dts [] = new String[4];
+			//Codigo sql para leer una fila en la tabla
 			String sql = "select * from " + TABLA;
 			Statement st = c1.createStatement();
 			ResultSet rs = st.executeQuery(sql);
@@ -329,19 +343,25 @@ public class ConexionAccess {
 					String fecha_st = rs1.getString(4);
 					String fecha_arr [] = fecha_st.split("/");
 					Date fecha_eliminar = new Date(Integer.parseInt(fecha_arr[0]), Integer.parseInt(fecha_arr[1]), Integer.parseInt(fecha_arr[2]));
+					//Checar si el año de la fecha en la tabla es menor al año actual
 					if(Integer.parseInt(fecha_arr[2]) < fecha.get_year()) {
+						//Codigo sql para eliminar de una tabla
 						String sql_del = "delete from " + tmp.table_format() + " where fecha = ?";
 						PreparedStatement pst = c1.prepareStatement(sql_del);
 						pst.setString(1, fecha_eliminar.toString());
 						n = pst.executeUpdate();
 					}
+					//Checar si el mes es un mes anterior al actual
 					else if(Integer.parseInt(fecha_arr[1]) < fecha.get_month()) {
+						//Codigo sql para eliminar de una tabla
 						String sql_del = "delete from " + tmp.table_format() + " where fecha = ?";
 						PreparedStatement pst = c1.prepareStatement(sql_del);
 						pst.setString(1, fecha_eliminar.toString());
 						n = pst.executeUpdate();
 					}
+					//Checar si el dia es un dia anterior al actual
 					else if(Integer.parseInt(fecha_arr[0]) < fecha.get_day()) {
+						//Codigo sql para eliminar de una tabla
 						String sql_del = "delete from " + tmp.table_format() + " where fecha = ?";
 						PreparedStatement pst = c1.prepareStatement(sql_del);
 						pst.setString(1, fecha_eliminar.toString());
@@ -367,6 +387,7 @@ public class ConexionAccess {
 	public static int update(Cita cita) {
 		try {
 			Connection c1 = ConexionAccess.obtenerConexion();
+			//Codigo sql para acualizar datos en una tabla
 			String sql = "update " + cita.getDoctor().table_format() + " set fecha = ?, hora = ? where Nombre=? and Apellidos=?";
 			PreparedStatement pst = c1.prepareStatement(sql);
 			pst.setString(1, cita.getFecha().toString());

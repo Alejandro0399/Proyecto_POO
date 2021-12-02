@@ -1,10 +1,10 @@
 package proyectoFinal;
 
 public enum Especialidades {
-	Pediatra("Pediatra"), Neurologo("Neurologo"), Dermatologo("Dermatologo"), 
-	Cardiologo("Cardiologo"), Rehabilitacion("Medicina de Rehabilitacion"), 
-	Oftalmologia("Oftalmologia"), Ortopedia("Ortopedia"), Urologo("Urologo"), 
-	General("Medico General");
+	Pediatra("Pediatía"), Neurologo("Neurología"), Dermatologo("Dermatología"), 
+	Cardiologo("Cardiología"), Rehabilitacion("Medicina de Rehabilitación"), 
+	Oftalmologia("Oftalmología"), Ortopedia("Ortopedia"), Urologo("Urología"), 
+	General("Médico General");
 	
 	private final String nombre_especialidad;
 	
